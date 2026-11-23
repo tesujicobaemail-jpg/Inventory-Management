@@ -391,7 +391,8 @@ async function fetchState(){const t=tk(),r=await fetch(SB_URL+"/rest/v1/app_stat
 async function go(){try{await fetchState();start()}catch(e){loginUI(e.message)}}
 function loginUI(m){$("nav").innerHTML="";$("app").innerHTML=`<div class="card" style="max-width:380px;margin:24px auto"><h2>Masuk</h2><div class="f" style="grid-template-columns:1fr"><div><label>Email</label><input id="le" type="email" autocomplete="username"></div><div><label>Kata sandi</label><input id="lp" type="password" autocomplete="current-password"></div></div><div class="row" style="margin-top:12px"><button class="p" id="lb">Masuk</button></div><p class="er">${esc(m||"")}</p></div>`;
   const run=async()=>{try{const r=await fetch(SB_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:H(),body:JSON.stringify({email:val("le"),password:$("lp").value})});
-    if(!r.ok)throw Error("Email atau kata sandi salah");setSes(await r.json());go()}catch(e){loginUI(e.message)}};
+    if(!r.ok){const j=await r.json().catch(()=>({}));throw Error((j.error_description||j.msg||j.message||"Gagal")+" ("+r.status+")")}
+;setSes(await r.json());go()}catch(e){loginUI(e.message)}};
   $("lb").onclick=run;$("lp").onkeydown=e=>{if(e.key==="Enter")run()}}
 if(ses)go();else loginUI();
 </script>
